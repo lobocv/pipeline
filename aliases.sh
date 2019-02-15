@@ -16,6 +16,11 @@ alias cxx="cd ../.."
 alias zshrc="vi ~/.zshrc"
 alias zshrcl="source ~/.zshrc"
 
+###########  GIT  ###############
+alias gitcom="git commit"
+alias gitam="git commit --amend"
+alias gl="git log"
+alias gs="git status"
 
 ########### TOOLS ###############
 
