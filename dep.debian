@@ -1,0 +1,14 @@
+apt update
+
+apt install wget
+
+apt install git
+
+# Zsh shell
+apt install zsh
+
+# Oh-my-zsh is a framework for managing zsh plugins
+wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+
+# Better top
+apt install htop
