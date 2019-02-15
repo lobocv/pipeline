@@ -11,6 +11,7 @@ alias cx="cd .."
 # Go up two dir
 alias cxx="cd ../.."
 
+alias dl="cd ~/Downloads"
 
 ########### RC FILE #############
 alias zshrc="vi ~/.zshrc"
