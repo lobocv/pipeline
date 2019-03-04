@@ -25,6 +25,47 @@ alias gd="git diff"
 alias gl="git log"
 alias gs="git status"
 
+########### DOCKER ###############
+function dockerssh() {
+	container=( `docker ps --format "{{.Names}}" | grep $1` )
+	num=${#container}
+	if [[ $num -gt 1 ]]; then
+		echo "More than one live container found for grep \"$1\". Choose a container from below:"
+		lc=1
+		for x in $container; 
+		do 
+			echo $lc. $x
+			lc=$((lc+1))
+	       	done
+		read c
+		target=$container[$(($c))]
+	else
+		target=$container[1]
+	fi
+	
+	docker exec -it $target ${2:-bash}
+}
+
+function dockerrun() {
+	images=( `docker images --format "{{.Repository}}:{{.Tag}}" | grep $1` )
+	if [[ ${#images} -gt 1 ]]; then
+		echo "More than one image:tag found for grep \"$1\". Choose an image below:"
+		lc=1
+		for x in $images; 
+		do 
+			echo $lc. $x
+			lc=$((lc+1))
+	       	done
+		read c
+		target=$images[$(($c))]
+	else
+		target=$images[1]
+	fi
+	
+	docker run --rm -it $target ${2:-bash}
+}
+
+
 ########### TOOLS ###############
 
 alias jsonp="python -m json.tool"
