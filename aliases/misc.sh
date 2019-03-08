@@ -16,11 +16,15 @@ alias dl="cd ~/Downloads"
 alias zshrc="vi ~/.zshrc"
 alias zshrcl="source ~/.zshrc"
 
-########### TOOLS ###############
+########### TEXT FORMATTING ###############
 
 # Formats stdin to pretty JSON
 alias jsonp="python -m json.tool"
 
+alias stripnl="tr -d '\r' | tr -d '\n'"
+
+
+########### TOOLS ###############
 # Retry a command repeatedly until it exits with status code 0
 function retry() {
 	ec="1"
