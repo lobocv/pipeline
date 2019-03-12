@@ -25,6 +25,16 @@ alias stripnl="tr -d '\r' | tr -d '\n'"
 
 
 ########### TOOLS ###############
+
+# Swap two  paths
+# $1 : path1
+# $2 : path2
+function swap() {
+	mv "$2" "$2.swaptemp"
+	mv "$1" "$2"
+	mv "$2.swaptemp" "$1"
+}
+
 # Retry a command repeatedly until it exits with status code 0
 function retry() {
 	ec="1"
