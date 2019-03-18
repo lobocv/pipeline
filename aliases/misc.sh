@@ -26,6 +26,9 @@ alias stripnl="tr -d '\r' | tr -d '\n'"
 
 ########### TOOLS ###############
 
+# Echo the return code of the last command
+alias rc="echo \$?"
+
 # Swap two  paths
 # $1 : path1
 # $2 : path2
