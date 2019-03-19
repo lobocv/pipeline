@@ -38,6 +38,12 @@ function swap() {
 	mv "$2.swaptemp" "$1"
 }
 
+# Search for a file recursively from the current directory
+# $1: File name (case insensitive)
+function search() {
+	find . -iname "*$1*"
+}
+
 # Retry a command repeatedly until it exits with status code 0
 function retry() {
 	ec="1"
