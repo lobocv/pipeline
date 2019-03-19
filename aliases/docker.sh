@@ -1,5 +1,14 @@
 alias containernames="docker ps --format "{{.Names}}""
 
+function _confirm_yesno() {
+	case "$1" in
+	     [yY][eE][sS]|[yY])
+		true;;
+	*)
+		false;;
+	esac
+}
+
 function findcontainer() {
 	if [[ -z "$1" ]]; then
 		containers=( `docker ps --format "{{.Names}}"` )
@@ -85,6 +94,24 @@ function dockeriplist() {
 	docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}} {{ .Name }}' | sed 's/ \// /'
 }
 
+# Kill all running docker containers
+function dockerkillall() {
+	echo "Are you sure you want to kill all running containers? [y/N]"
+	read cont
+	_confirm_yesno "$cont" && docker kill $(docker ps -q)
+}
+
+# Delete all images
+function dockerrmi() {
+	IMAGES=$(docker images -q)
+	echo "Are you sure you want to delete all images? [y/N]"
+	read cont
+	_confirm_yesno "$cont" && docker rmi "${IMAGES}"
+}
+
+# Run a command in a docker image
+# $1: Name of the container to grep for
+# $2: Command to run (Default: bash)
 function dockerrun() {
 	images=( `docker images --format "{{.Repository}}:{{.Tag}}" | grep $1` )
 	if [[ ${#images} -gt 1 ]]; then
