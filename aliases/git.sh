@@ -8,10 +8,9 @@ alias gs="git status"
 # Rebase the current branch onto the most up to date specified branch
 # $1: Branch to rebase onto (Default: master)
 function gitrebase() {
-	set -e
 	base=${1:-master}
-	echo git checkout "$base"
-	echo git pull
-	echo git checkout -
-	echo git rebase "$base"
+	git checkout "$base"
+	git pull
+	git checkout -
+	git rebase "$base"
 }
