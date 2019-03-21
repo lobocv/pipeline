@@ -26,6 +26,26 @@ alias stripnl="tr -d '\r' | tr -d '\n'"
 
 ########### TOOLS ###############
 
+# Show files over a certain file size
+# $1: Human-readable file size (ex. 50M, 100K, 2G)
+function filesover() {
+	USAGE=$(du --all --human-readable --threshold="$1")
+	echo "$USAGE" | while read line;
+	do
+		fp=$(echo "$line" | cut -f 2)
+		if [[ ! -d "$fp" ]]; then
+			echo $line
+		fi
+
+	done
+}
+
+# Show files over a certain file size
+# $1: Human-readable file size (ex. 50M, 100K, 2G)
+function dirsover() {
+	du --human-readable --threshold="$1"
+}
+
 # Echo the return code of the last command
 alias rc="echo \$?"
 
