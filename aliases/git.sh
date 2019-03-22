@@ -4,6 +4,7 @@ alias gitch="git checkout"
 alias gd="git diff"
 alias gl="git log"
 alias gs="git status"
+alias githash="git rev-parse HEAD"
 
 # Rebase the current branch onto the most up to date specified branch
 # $1: Branch to rebase onto (Default: master)
