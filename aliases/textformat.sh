@@ -18,7 +18,9 @@ alias hl="_highlight $DEFAULT_HL_COLOR 39"
 
 # Colors
 alias cBlack="_highlight 30 39"
+alias cLightRed="_highlight 91 39"
 alias cRed="_highlight 31 39"
+alias cLightBlue="_highlight 94 39"
 alias cBlue="_highlight 34 39"
 alias cGreen="_highlight 32 39"
 alias cPink="_highlight 95 39"
