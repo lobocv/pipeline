@@ -19,6 +19,9 @@ alias zshrcl="source ~/.zshrc"
 
 ########### TOOLS ###############
 
+# Open a file of URL in the default application
+alias dopen="xdg-open"
+
 # Echo the return code of the last command
 alias rc="echo \$?"
 
