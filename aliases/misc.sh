@@ -26,6 +26,13 @@ alias stripnl="tr -d '\r' | tr -d '\n'"
 
 ########### TOOLS ###############
 
+# Replace words with another
+# $1: Word or regex to replace
+# $2: Replacement word
+function replace() {
+	sed -r "s|$1|$2|g"
+}
+
 # Show files over a certain file size
 # $1: Human-readable file size (ex. 50M, 100K, 2G)
 function filesover() {
