@@ -1,4 +1,4 @@
-# Tools for coloring terminal output
+# Text formatting tools for terminal output
 
 DEFAULT_HL_COLOR=93
 # Highlight text
@@ -37,4 +37,18 @@ alias cBlink="_highlight 5 25"
 alias cHighlight="_highlight 7 27"
 alias cHide="_highlight 8 28"
 alias cStrike="_highlight 9 0"
+
+
+# Right justify stdin 
+rjust() {
+    read TEXT
+   
+    padlimit=$(tput cols)
+    pad=$(printf '%*s' "$padlimit")
+    pad=${pad// / }
+    padlength=$(tput cols)
+    
+    printf '%*.*s' 0 $((padlength - ${#TEXT})) "$pad"
+    printf '%s' "$TEXT"
+}
 
