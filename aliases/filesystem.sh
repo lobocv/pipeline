@@ -38,6 +38,14 @@ function search() {
         find . -iname "*$1*"
 }
 
+# Recursively search for text within files in a folder
+# $1: Search text
+# $2: Search directory (Default: $PWD)
+function textsearch() {
+	DIR=${2:-.}
+	grep -R "$1" ${DIR}
+}
+
 # Capture a filepath into a buffer that can be used with other commands (drop, etc) 
 function hold() {
 	if [ -f "$1" ]; then
