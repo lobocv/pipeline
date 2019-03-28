@@ -1,6 +1,8 @@
 
 alias df="df -h | cCyan '[0-9]+\.?[0-9]?G' | cYellow '[0-9]+\.?[0-9]?M' | cGreen '[0-9]+\.?[0-9]?K' | cRed '9[0-9]\%' | cLightRed '8[0-9]\%'"
 
+alias fullpath="readlink -e"
+
 # Show files over a certain file size
 # $1: Human-readable file size (ex. 50M, 100K, 2G)
 function filesover() {

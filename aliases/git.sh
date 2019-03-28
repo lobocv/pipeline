@@ -21,3 +21,7 @@ function githash() {
 	branch=${1:-HEAD}
 	git rev-parse $branch
 }
+
+function gitlastdiff() {	
+	git diff $(git rev-parse HEAD~1) $(git rev-parse HEAD) 
+}
