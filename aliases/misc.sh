@@ -47,3 +47,18 @@ function retry() {
 		prev_result=$result
 	done
 }
+
+# Get the default application for a file.
+# $1: Filepath
+function defaultapp() {
+	MIMETYPE=$(xdg-mime query filetype "$1")
+	DESKTOP_FILE_ID=$(xdg-mime query default "$MIMETYPE")
+	if [[ ! -z "$DESKTOP_FILE_ID" ]]; then
+		DESKTOP_FILE=$(find "/usr/share/applications" -name "$DESKTOP_FILE_ID")
+		APP=$(cat "$DESKTOP_FILE" | grep "TryExec=\|Exec=" | cut -d "=" -f 2 | cut -d " " -f 1)
+		echo $(which $APP)
+	else
+		echo "Failed to find default application for mime-type: $MIMETYPE"
+		return 1
+	fi
+}

@@ -35,7 +35,8 @@ function swap() {
 # Search for a file recursively from the current directory
 # $1: File name (case insensitive)
 function search() {
-        find . -iname "*$1*"
+	DIR=${2:-.}
+        find "${DIR}" -iname "*$1*"
 }
 
 # Recursively search for text within files in a folder
