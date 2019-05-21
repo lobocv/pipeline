@@ -93,3 +93,15 @@ function release() {
 	fi
 }
 
+# Writes a file containing random characters
+# Example: randfile /tmp/randfile.txt 10  # Make 10KB file
+# Example: randfile /tmp/randfile.txt 10 1048576 # Make 10MB file
+# $1: Filepath
+# $2: Number of blocks
+# $3: Block size (Default: 1KB)
+function randfile() {
+	file=${1}
+	COUNT=${2}	
+	BS=${3:-1024}
+	dd if=/dev/urandom of="${file}" bs=${BS} count=${COUNT}
+}
