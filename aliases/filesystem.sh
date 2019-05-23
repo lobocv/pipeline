@@ -105,3 +105,28 @@ function randfile() {
 	BS=${3:-1024}
 	dd if=/dev/urandom of="${file}" bs=${BS} count=${COUNT}
 }
+
+# Rename file with .bak appended to it. If a file with .bak is already found, it will undo the process
+# and remove the .bak
+# Example: If a file named test.txt exists.
+# The following renamed test.txt to test.txt.bak
+# >> bak test.txt 
+# And the following will renamed test.txt.bak back to test.txt
+# >> bak test.txt.bak 
+# OR 
+# >> bak test.txt
+function bak() {
+	file="$1"
+	REGEX='.*bak'
+	if [[ ${file} =~ '.*bak' ]]; then
+		# strip .bak from filename
+		renamed="${file%".bak"}" 
+	elif [[ -f ${file} ]]; then
+		# add .bak to filename
+		renamed="${file}.bak"
+	elif  [[ ! -f ${file} ]] && [[ -f "${file}.bak" ]]; then
+		renamed="${file}"
+		file="${file}.bak"
+	fi
+	mv -v -i "${file}" "${renamed}" 1>&2
+}
