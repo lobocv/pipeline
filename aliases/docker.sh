@@ -1,4 +1,5 @@
 alias containernames="docker ps --format "{{.Names}}""
+alias imagenames="docker image ls --format "{{.Repository}}:{{.Tag}}""
 
 function _confirm_yesno() {
 	case "$1" in
@@ -29,6 +30,23 @@ function findcontainer() {
 	else
 		container=$containers[1]
 	fi
+}
+
+function findimage() {
+	images=( `docker images --format "{{.Repository}}:{{.Tag}}" | grep $1` )
+	if [[ ${#images} -gt 1 ]]; then
+		echo "More than one image:tag found for grep \"$1\". Choose an image below:"
+		lc=1
+		for x in $images; 
+		do 
+			echo $lc. $x
+			lc=$((lc+1))
+	       	done
+		read c
+		image=$images[$(($c))]
+	else
+		image=$images[1]
+	fi	
 }
 
 # SSH into a running docker container.
@@ -101,8 +119,14 @@ function dockerkillall() {
 	_confirm_yesno "$cont" && docker kill $(docker ps -q)
 }
 
-# Delete all images
 function dockerrmi() {
+	findimage "$1"
+	echo "Are you sure you want to delete this image?\n$image"
+	read cont
+	_confirm_yesno "$cont" && docker rmi "$image"
+}
+# Delete all images
+function dockerrmiall() {
 	IMAGES=$(docker images -q)
 	echo "Are you sure you want to delete all images? [y/N]"
 	read cont
@@ -113,21 +137,7 @@ function dockerrmi() {
 # $1: Name of the container to grep for
 # $2: Command to run (Default: bash)
 function dockerrun() {
-	images=( `docker images --format "{{.Repository}}:{{.Tag}}" | grep $1` )
-	if [[ ${#images} -gt 1 ]]; then
-		echo "More than one image:tag found for grep \"$1\". Choose an image below:"
-		lc=1
-		for x in $images; 
-		do 
-			echo $lc. $x
-			lc=$((lc+1))
-	       	done
-		read c
-		target=$images[$(($c))]
-	else
-		target=$images[1]
-	fi
-	
-	docker run --rm -it --entrypoint ${2:-bash} $target
+	findimage "$1"
+	docker run --rm -it --entrypoint ${2:-bash} "$image"
 }
 
