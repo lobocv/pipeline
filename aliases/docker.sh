@@ -1,5 +1,6 @@
-alias containernames="docker ps --format "{{.Names}}""
-alias imagenames="docker image ls --format "{{.Repository}}:{{.Tag}}""
+alias containernames="docker ps --format '{{.Names}}'"
+alias containerports="docker ps --format '{{.Ports}}'"
+alias imagenames="docker image ls --format '{{.Repository}}:{{.Tag}}'"
 
 function _confirm_yesno() {
 	case "$1" in
@@ -119,6 +120,7 @@ function dockerkillall() {
 	_confirm_yesno "$cont" && docker kill $(docker ps -q)
 }
 
+# Remove a specific image
 function dockerrmi() {
 	findimage "$1"
 	echo "Are you sure you want to delete this image?\n$image"
@@ -133,6 +135,35 @@ function dockerrmiall() {
 	_confirm_yesno "$cont" && docker rmi "${IMAGES}"
 }
 
+function dockerclean() {
+	force="$1"
+	if [[ "$force" = "-f" ]]; then
+		msg="Are you sure you want to remove all unused images and volumes? [y/N]"
+		args="--force --volumes"
+	else
+		num_images=$(docker images -f dangling=true | wc -l)
+		msg="Are you sure you want to remove $num_images dangling images? [y/N]"
+		args=""
+	fi
+	echo $msg
+	read cont
+	_confirm_yesno "$cont" && docker system prune $args
+	
+}
+function imagesizes() {
+	case "$1" in
+	     [-a][--all])
+		show_all=true;;
+	*)
+		show_all=false;;
+	esac
+	out=$(docker image ls --format '{{.Size}} {{.Repository}} {{.Tag}}' | sort -h -r)
+	if [[ $show_all = true ]]; then
+		echo $out
+	else
+		echo $out | head
+	fi
+}
 # Run a command in a docker image
 # $1: Name of the container to grep for
 # $2: Command to run (Default: bash)
