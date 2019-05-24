@@ -1,6 +1,4 @@
-alias containernames="docker ps --format '{{.Names}}'"
-alias containerports="docker ps --format '{{.Ports}}'"
-alias imagenames="docker image ls --format '{{.Repository}}:{{.Tag}}'"
+alias cports="docker ps --format '{{.Ports}}'"
 
 function _confirm_yesno() {
 	case "$1" in
@@ -80,6 +78,19 @@ function dockerkill() {
 	docker kill $2 "$container"
 }
 
+# Show container names
+# $1: -v | --verbose
+function cnames() {
+	case "$1" in
+	     [-v][--verbose])
+		docker ps --format '{{.Names}}\t{{.RunningFor}}';;
+	*)
+		docker ps --format '{{.Names}}';;
+	esac	
+}
+
+
+
 # Get the info of a running docker container.
 # $1: Container name to grep for
 function dockerinspect() {
@@ -150,6 +161,9 @@ function dockerclean() {
 	_confirm_yesno "$cont" && docker system prune $args
 	
 }
+
+# Show image sizes
+# $1: -a | --all
 function imagesizes() {
 	case "$1" in
 	     [-a][--all])
@@ -164,6 +178,24 @@ function imagesizes() {
 		echo $out | head
 	fi
 }
+
+# Show image names
+# $1: -a | --all
+function inames() {
+	case "$1" in
+	     [-a][--all])
+		show_all=true;;
+	*)
+		show_all=false;;
+	esac
+	out=$(docker image ls --format '{{.Repository}}:{{.Tag}}')
+	if [[ $show_all = true ]]; then
+		echo $out
+	else
+		echo $out | head
+	fi
+}
+
 # Run a command in a docker image
 # $1: Name of the container to grep for
 # $2: Command to run (Default: bash)
