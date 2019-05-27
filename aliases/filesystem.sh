@@ -3,6 +3,10 @@ alias df="df -h | cCyan '[0-9]+\.?[0-9]?G' | cYellow '[0-9]+\.?[0-9]?M' | cGreen
 
 alias fullpath="readlink -e"
 
+function echoerr() {
+	echo "$@" 1>&2
+}
+
 # Show files over a certain file size
 # $1: Human-readable file size (ex. 50M, 100K, 2G)
 function filesover() {
@@ -129,4 +133,29 @@ function bak() {
 		file="${file}.bak"
 	fi
 	mv -v -i "${file}" "${renamed}" 1>&2
+}
+
+# List options for previous directories to change to
+function fd() {
+	PAST_DIRS=(`pushd`)
+	if [[ ${#PAST_DIRS} -gt 1 ]]; then
+		echo "Choose a path:"
+		lc=1
+		for x in $PAST_DIRS;
+		do
+			echo "$lc. $x"
+			lc=$((lc+1))
+		done
+		read p
+		if [[ ${p} -gt ${#PAST_DIRS} ]]; then
+			echoerr "No such option $p exists"
+			return 1
+		fi
+		cd $(echo "$PAST_DIRS[$(($p))]" | sed -r "s|~|$HOME|" )
+
+	else
+		echoerr "No directory history"
+		return 1
+	fi
+
 }
