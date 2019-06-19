@@ -1,6 +1,6 @@
 
 alias df="df -h | cCyan '[0-9]+\.?[0-9]?G' | cYellow '[0-9]+\.?[0-9]?M' | cGreen '[0-9]+\.?[0-9]?K' | cRed '9[0-9]\%' | cLightRed '8[0-9]\%'"
-
+alias flw="tail -f -v"
 alias fullpath="readlink -e"
 
 function echoerr() {
