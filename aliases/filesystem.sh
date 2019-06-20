@@ -183,3 +183,28 @@ function untar() {
 function tarview() {
 	tar -tf "$1"
 }
+
+# Colorized output of less. Requires python pygmentize package
+# $1 : File path
+function lesscolor() {
+	OPTS="-O style=friendly"
+	LEXER=""
+
+	case "$1" in
+	    *.awk|*.groff|*.java|*.js|*.m4|*.php|*.pl|*.pm|*.pod|*.sh|\
+	    *.ad[asb]|*.asm|*.inc|*.[ch]|*.[ch]pp|*.[ch]xx|*.cc|*.hh|\
+	    *.lsp|*.l|*.pas|*.p|*.xml|*.xps|*.xsl|*.axp|*.ppd|*.pov|\
+	    *.diff|*.patch|*.py|*.rb|*.sql|*.ebuild|*.eclass)
+	        OPTS="-O style=fruity";;
+   	    *.go|*.html)
+		OPTS="-O style=fruity";;
+	    *)
+	        if grep -q "#\!/bin/bash" "$1" 2> /dev/null; then
+	            LEXER="-l sh"
+	        else
+	            return 1
+        	fi
+	esac
+
+	pygmentize -f 256 $OPTS $LEXER "$1" | less -R
+}
