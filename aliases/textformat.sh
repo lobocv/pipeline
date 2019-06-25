@@ -14,6 +14,21 @@ function _highlight() {
 	done
 }
 
+# Reads from stdin and removes a line matching the regex
+# $1 : Regex
+function removeline() {
+	MATCH="$1"
+	while read TEXT;
+	do
+		# & acts as the match group in sed
+		fmtline=$(echo "$TEXT" | sed -r "s|"$MATCH"||g")
+		if [[ ! -z "$fmtline" ]]; then
+			echo "$fmtline"
+		fi
+
+	done
+
+}
 alias hl="_highlight $DEFAULT_HL_COLOR 39"
 
 # Colors
@@ -40,7 +55,6 @@ alias cBlink="_highlight 5 25"
 alias cHighlight="_highlight 7 27"
 alias cHide="_highlight 8 28"
 alias cStrike="_highlight 9 0"
-
 
 # Right justify stdin 
 rjust() {
