@@ -39,17 +39,64 @@ function swap() {
 # Search for a file recursively from the current directory
 # $1: File name (case insensitive)
 function search() {
+	local DIR
 	DIR=${2:-.}
         find "${DIR}" -iname "*$1*"
 }
+
+# Search for a file and open it
+# $@ : Arguments to search()
+function fopen() {
+        local FILES num
+        FILES=(`search $@`)
+	num=${#FILES}
+	if [[ $num -gt 0 ]]; then
+	        count=0
+	        for f in $FILES; do
+	                count=$((count+1))
+	                echo "$count. $f"
+	        done
+	        read c
+		if [[ $c -gt $num ]]; then
+			echo "Invalid number"
+			return 1
+		fi
+	        vim $FILES[$c]
+	fi
+}
+
 
 # Recursively search for text within files in a folder
 # $1: Search text
 # $2: Search directory (Default: $PWD)
 function textsearch() {
+	local DIR
 	DIR=${2:-.}
 	grep -R "$1" ${DIR}
 }
+
+# Search for a file that contains certain text and open it
+# $@ : Arguments to textsearch()
+function ftopen() {
+        local FILES DIR num 
+        DIR=${2:-.}
+        FILES=(`grep -R -l "$1" $DIR`)
+	num=${#FILES}
+	if [[ $num -gt 0 ]]; then
+	        count=0
+	        for f in $FILES; do
+	                count=$((count+1))
+	                echo "$count. $f"
+	        done
+	        read c
+		if [[ $c -gt $num ]]; then
+			echo "Invalid number"
+			return 1
+		fi
+	        vim $FILES[$c]
+	fi
+}
+
 
 # Capture a filepath into a buffer that can be used with other commands (drop, etc) 
 function hold() {

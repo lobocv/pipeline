@@ -1,4 +1,6 @@
 alias cports="docker ps --format '{{.Ports}}'"
+alias dc="docker-compose"
+
 
 function _confirm_yesno() {
 	case "$1" in
