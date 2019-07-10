@@ -50,6 +50,24 @@ function findimage() {
 	fi	
 }
 
+function findvolume() {
+	volumes=( `docker volume ls --format "{{.Name}}" | grep $1` )
+	if [[ ${#volumes} -gt 1 ]]; then
+		echo "More than one volume found for grep \"$1\". Choose a volume below:"
+		lc=1
+		for x in $volumes; 
+		do 
+			echo $lc. $x
+			lc=$((lc+1))
+	       	done
+		read c
+		volume=$volumes[$(($c))]
+	else
+		volume=$volumes[1]
+	fi	
+}
+
+
 # SSH into a running docker container.
 # $1: Container name to grep for
 # $2: Shell to use (default: bash)
@@ -147,6 +165,18 @@ function dockerrmiall() {
 	read cont
 	_confirm_yesno "$cont" && docker rmi "${IMAGES}"
 }
+
+# Delete volume
+function dockerrmv() {
+	findvolume "$1"
+	if [[ -z "${volume}" ]]; then
+		return 1
+	fi
+	echo "Are you sure you want to delete volume ${volume}? [y/N]"
+	read cont
+	_confirm_yesno "$cont" && docker volume rm "${volume}"
+}
+
 
 function dockerclean() {
 	force="$1"
