@@ -109,7 +109,22 @@ function cnames() {
 	esac	
 }
 
-
+# Show volume names
+# $1: -a | --all
+function vnames() {
+        case "$1" in
+             [-a][--all])
+                show_all=true;;
+        *)
+                show_all=false;;
+        esac
+        out=$(docker volume ls --format '{{.Name}}')
+        if [[ $show_all = true ]]; then
+                echo $out
+        else        
+                echo $out | head
+        fi
+}
 
 # Get the info of a running docker container.
 # $1: Container name to grep for
