@@ -26,3 +26,22 @@ function githash() {
 function gitlastdiff() {	
 	git diff $(git rev-parse HEAD~1) $(git rev-parse HEAD) 
 }
+
+# Delete a branch
+# $1: Branch name (Default: current branch)
+function gitdel() {
+	CURRENT=$(git rev-parse --abbrev-ref HEAD)
+	BRANCH=${1:-$CURRENT}
+	echo "Are you sure you want to delete branch $BRANCH? [y|N]" 
+	read cont
+	if ! _confirm_yesno "$cont"; then
+	        return 0
+	fi
+	
+	if [[ "$CURRENT" = "$BRANCH" ]]; then
+	        git checkout - > /dev/null
+	fi
+	
+	git branch -d "$BRANCH"
+}
+
