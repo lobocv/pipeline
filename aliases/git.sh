@@ -1,10 +1,34 @@
 alias gitcom="git commit"
 alias gitam="git commit --amend"
-alias gitch="git checkout"
 alias gd="git diff"
 alias gl="git log"
 alias gs="git status"
+alias gitch="git checkout"
 alias newbranch="git checkout -b"
+
+# Checkout a local git branch
+# $1: Name of branch or filter
+function gc() {
+	local BRANCHES BRANCH="$1"
+	BRANCHES=(`git branch --list | grep $BRANCH`)
+	if [[ ${#BRANCHES} -gt 1 ]]; then
+		echo "More than one branch is found for grep \"$BRANCH\". Choose a branch:"
+		lc=1
+		for x in $BRANCHES;
+		do
+			if [[ "$x" = "*" ]]; then
+				continue;
+			fi
+			echo $lc. $x
+                        lc=$((lc+1))
+                done
+                read c
+                B=$BRANCHES[$(($c))]
+	else
+		B=$BRANCHES[1]
+	fi
+	git checkout $B
+}
 
 # Rebase the current branch onto the most up to date specified branch
 # $1: Branch to rebase onto (Default: master)
