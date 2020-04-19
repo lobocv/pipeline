@@ -1,0 +1,5 @@
+{"first_name": "James", "last_name": "Hetfield"}
+{"first_name": "Kirk", "last_name": "Hammett"}
+{"first_name": "Lars", "last_name": "Ulrich"}
+{"first_name": "Jason", "last_name": "Newstead"}
+{"first_name": "Robert", "last_name": "Trujillo"}

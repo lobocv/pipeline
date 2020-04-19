@@ -1,0 +1,4 @@
+1. This is the first line from the example 1
+2. This is the second line from the example 1
+3. This is the third line from the example 1
+4. This is the last line from the example 1
