@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/encoder"
+	"github.com/lobocv/pipeline/pencode"
 	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
 	"time"
@@ -14,14 +14,20 @@ import (
 
 type ExampleJSONProcessor struct{}
 
+type Output struct {
+	Input
+	Title string `json:"title"`
+}
+
 // Decorate the line with XXX. Sleep for a random amount of time to show asynchronicity
 func (p ExampleJSONProcessor) Process(payload interface{}) (interface{}, error) {
 
 	s := payload.(*Input)
 	sleep := rand.Intn(1000)
 	time.Sleep(time.Duration(sleep) * time.Millisecond)
-	processedLine := fmt.Sprintf("Processor sees: First Name = %s Last Name = %s\n", s.First, s.Last)
-	return []byte(processedLine), nil
+	fmt.Printf("Processor sees: First Name = %s Last Name = %s. Adding Mr title.\n", s.First, s.Last)
+
+	return Output{Input: *s, Title: "Mr"}, nil
 }
 
 type ExampleWriter struct{}
@@ -45,13 +51,12 @@ func main() {
 	mustSucceed(err)
 	fileWriter := pipeio.NewFileWriter(outFile)
 
-	passthrough := encoder.PassThrough{}
-
 	alloc := func() interface{} {
 		return new(Input)
 	}
-
-	p := pipeline.NewPipeline(encoder.NewJSONDecoder(alloc, false), passthrough)
+	dec := pencode.NewJSONDecoder(alloc, false)
+	enc := pencode.NewJSONEncoder()
+	p := pipeline.NewPipeline(dec, enc)
 	p.SetProcessor(ExampleJSONProcessor{})
 	p.AddReaders(reader1)
 	p.AddWriters(ExampleWriter{}, fileWriter)

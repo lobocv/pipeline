@@ -1,4 +1,4 @@
-package encoder
+package pencode
 
 import (
 	"bytes"
@@ -23,4 +23,17 @@ func (d JSONDecoder) Decode(b []byte) (interface{}, error) {
 	}
 	err := dec.Decode(v)
 	return v, err
+}
+
+type JSONEncoder struct{}
+
+func NewJSONEncoder() *JSONEncoder {
+	return &JSONEncoder{}
+}
+
+func (d JSONEncoder) Encode(v interface{}) ([]byte, error) {
+	writer := bytes.Buffer{}
+	enc := json.NewEncoder(&writer)
+	err := enc.Encode(v)
+	return writer.Bytes(), err
 }

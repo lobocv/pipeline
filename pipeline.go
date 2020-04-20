@@ -1,10 +1,9 @@
 package pipeline
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/encoder"
+	"github.com/lobocv/pipeline/pencode"
 	"sync"
 )
 
@@ -34,15 +33,15 @@ type Pipeline struct {
 	errHandler func(context.Context, error) error
 
 	// Encoder and decoder for the inputs and outputs of the pipeline
-	enc encoder.Encoder
-	dec encoder.Decoder
+	enc pencode.Encoder
+	dec pencode.Decoder
 
 	// Done channel used to stop the pipeline if a fatal error occurs
 	done chan struct{}
 }
 
 // NewPipeline creates a new pipeline
-func NewPipeline(dec encoder.Decoder, enc encoder.Encoder) *Pipeline {
+func NewPipeline(dec pencode.Decoder, enc pencode.Encoder) *Pipeline {
 	return &Pipeline{enc: enc, dec: dec, errHandler: defaultErrorHandler, done: make(chan struct{})}
 }
 
@@ -134,14 +133,14 @@ loop:
 				continue
 			}
 
-			var buf = bytes.Buffer{}
-			if err := p.enc.Encode(&buf, result); err != nil {
+			var rawResult []byte
+			if rawResult, err = p.enc.Encode(result); err != nil {
 				errChan <- err
 				continue
 			}
 
 			// write the results of the payload
-			if err = p.write(buf.Bytes()); err != nil {
+			if err = p.write(rawResult); err != nil {
 				errChan <- err
 				continue
 			}
@@ -160,7 +159,7 @@ loop:
 	fmt.Println("Stopping reader")
 }
 
-func (p *Pipeline) AddEncoder(enc encoder.Encoder, _ PipeWriter) {
+func (p *Pipeline) AddEncoder(enc pencode.Encoder, _ PipeWriter) {
 	// TODO: Make writers map to encoders so that each writer can have it's own custom encoding but share encoded payloads.
 	p.enc = enc
 }

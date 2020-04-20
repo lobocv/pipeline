@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/encoder"
+	"github.com/lobocv/pipeline/pencode"
 	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
 	"strings"
@@ -48,7 +48,7 @@ func main() {
 	mustSucceed(err)
 	fileWriter := pipeio.NewFileWriter(outFile)
 
-	passthrough := encoder.PassThrough{}
+	passthrough := pencode.PassThrough{}
 	p := pipeline.NewPipeline(passthrough, passthrough)
 	p.SetProcessor(ExampleLineProcessor{})
 	p.AddReaders(reader1, reader2)

@@ -1,11 +1,7 @@
-package encoder
-
-import (
-	"io"
-)
+package pencode
 
 type Encoder interface {
-	Encode(b io.Writer, v interface{}) error
+	Encode(v interface{}) ([]byte, error)
 }
 
 type Decoder interface {
