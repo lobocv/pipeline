@@ -12,7 +12,7 @@ type Processor interface {
 }
 
 func defaultErrorHandler(ctx context.Context, err error) error {
-	fmt.Printf("ERROR ENCOUNTERED WHILE READING: %s\n", err)
+	fmt.Printf("An error was encountered in the pipeline: %s\n", err)
 	return err
 }
 
@@ -169,7 +169,7 @@ func (p *Pipeline) write(results []byte) error {
 	var errors []pipelineError
 
 	for _, w := range p.writers {
-		if err := w.Write(results); err != nil {
+		if _, err := w.Write(results); err != nil {
 			// Create a pipelineError from the returned error
 			var pipelineErr pipelineError
 			pipelineErr.FromError(err)

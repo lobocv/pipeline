@@ -8,16 +8,14 @@ import (
 var EOF = io.EOF
 
 type pipelineError struct {
+	error
 	fatal     bool
 	temporary bool
 	msg       string
 }
 
-func (e *pipelineError) Error() string {
-	return e.msg
-}
-
 func (e *pipelineError) FromError(err error) {
+	e.error = err
 	if specificErr, ok := err.(Fatal); ok {
 		e.fatal = specificErr.Fatal()
 	}

@@ -5,19 +5,6 @@ import (
 	"os"
 )
 
-type FileWriter struct {
-	f *os.File
-}
-
-func (f FileWriter) Write(payload []byte) error {
-	_, err := f.f.Write(payload)
-	return err
-}
-
-func NewFileWriter(f *os.File) *FileWriter {
-	return &FileWriter{f: f}
-}
-
 type FileLineReader struct {
 	r *bufio.Reader
 }

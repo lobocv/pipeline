@@ -1,5 +1,7 @@
 package pipeline
 
+import "io"
+
 type PipeWriter interface {
-	Write(payload []byte) error
+	io.Writer
 }

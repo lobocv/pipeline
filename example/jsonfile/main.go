@@ -6,6 +6,7 @@ import (
 	"github.com/lobocv/pipeline/pencode"
 	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
+	"net"
 	"time"
 
 	"github.com/lobocv/pipeline"
@@ -30,13 +31,6 @@ func (p ExampleJSONProcessor) Process(payload interface{}) (interface{}, error) 
 	return Output{Input: *s, Title: "Mr"}, nil
 }
 
-type ExampleWriter struct{}
-
-func (p ExampleWriter) Write(payload []byte) error {
-	fmt.Println("Writing:", string(payload))
-	return nil
-}
-
 type Input struct {
 	First string `json:"first_name"`
 	Last  string `json:"last_name"`
@@ -49,7 +43,12 @@ func main() {
 
 	outFile, err := os.OpenFile("./output.txt", os.O_WRONLY|os.O_CREATE, 0600)
 	mustSucceed(err)
-	fileWriter := pipeio.NewFileWriter(outFile)
+
+	// Use netcat -l -k localhost 8999 to see results :)
+	tcpConn, tcpConnErr := net.Dial("tcp", "localhost:8999")
+
+	// Use netcat -l -u -k localhost 8998 to see results :)
+	udpConn, udpConnErr := net.Dial("udp", "localhost:8998")
 
 	alloc := func() interface{} {
 		return new(Input)
@@ -59,7 +58,13 @@ func main() {
 	p := pipeline.NewPipeline(dec, enc)
 	p.SetProcessor(ExampleJSONProcessor{})
 	p.AddReaders(reader1)
-	p.AddWriters(ExampleWriter{}, fileWriter)
+	p.AddWriters(outFile, os.Stdout)
+	if tcpConnErr == nil {
+		p.AddWriters(tcpConn)
+	}
+	if udpConnErr == nil {
+		p.AddWriters(udpConn)
+	}
 	p.Run(context.Background())
 }
 
