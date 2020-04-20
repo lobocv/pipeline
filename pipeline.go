@@ -8,7 +8,7 @@ import (
 )
 
 type Processor interface {
-	Process(payload interface{}) (interface{}, error)
+	Process(ctx context.Context, payload interface{}) (interface{}, error)
 }
 
 func defaultErrorHandler(ctx context.Context, err error) error {
@@ -17,6 +17,9 @@ func defaultErrorHandler(ctx context.Context, err error) error {
 }
 
 type errorHandler func(context.Context, error) error
+
+type Tee struct {
+}
 
 type Pipeline struct {
 	proc Processor
@@ -73,27 +76,35 @@ func (p *Pipeline) Run(ctx context.Context) {
 	for _, r := range p.readers {
 		go p.listen(ctx, r)
 	}
-	select {
-	case <-ctx.Done():
-		fmt.Println("Exiting pipeline gracefully")
-		return
-	case <-p.done:
-		fmt.Println("Stopping pipeline")
+loop:
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("Pipeline canceled")
+			break loop
+		case <-p.done:
+			if len(p.readers) == 0 {
+				fmt.Println("No more readers. Stopping pipeline")
+				break loop
+			}
+		}
 	}
+	fmt.Println("Exiting pipeline gracefully")
 }
 
 func (p *Pipeline) RemoveReader(r PipeReader) {
-	fmt.Println("Removing reader")
-	var readers []PipeReader
+	fmt.Println("Removing reader", r)
+	n := 0
 	for _, otherReader := range p.readers {
 		if r != otherReader {
-			readers = append(readers, r)
+			p.readers[n] = otherReader
+			n++
 		}
 	}
 	p.readerLock.Lock()
-	p.readers = readers
+	p.readers = p.readers[:n]
 	p.readerLock.Unlock()
-	fmt.Println("Reader removed", p.readers)
+	fmt.Println("Readers remaining", p.readers)
 }
 
 // listen starts the pipelines for the specified reader
@@ -127,7 +138,7 @@ loop:
 			}
 
 			// Pass the payload to be processed
-			result, err := p.proc.Process(dataPayload)
+			result, err := p.proc.Process(ctx, dataPayload)
 			if err != nil {
 				errChan <- err
 				continue

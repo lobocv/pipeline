@@ -16,7 +16,7 @@ import (
 type ExampleLineProcessor struct{}
 
 // Decorate the line with XXX. Sleep for a random amount of time to show asynchronicity
-func (p ExampleLineProcessor) Process(payload interface{}) (interface{}, error) {
+func (p ExampleLineProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
 	s := string(payload.([]byte))
 	sleep := rand.Intn(1000)
 	time.Sleep(time.Duration(sleep) * time.Millisecond)
@@ -26,9 +26,9 @@ func (p ExampleLineProcessor) Process(payload interface{}) (interface{}, error) 
 
 type ExampleWriter struct{}
 
-func (p ExampleWriter) Write(payload []byte) error {
+func (p ExampleWriter) Write(payload []byte) (int, error) {
 	fmt.Println("Writing:", string(payload))
-	return nil
+	return len(payload), nil
 }
 
 type Input struct {
@@ -46,14 +46,16 @@ func main() {
 
 	outFile, err := os.OpenFile("./output.txt", os.O_WRONLY|os.O_CREATE, 0600)
 	mustSucceed(err)
-	fileWriter := pipeio.NewFileWriter(outFile)
 
 	passthrough := pencode.PassThrough{}
 	p := pipeline.NewPipeline(passthrough, passthrough)
 	p.SetProcessor(ExampleLineProcessor{})
 	p.AddReaders(reader1, reader2)
-	p.AddWriters(ExampleWriter{}, fileWriter)
-	p.Run(context.Background())
+	p.AddWriters(ExampleWriter{}, os.Stdout, outFile)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	p.Run(ctx)
 
 }
 
