@@ -4,11 +4,13 @@
 
 Pipelines follow a general work flow:
 
-[PipeReader] ==> [Decoding] ==> [Processing] ==> [Error Handling] ==> [Encoding] ==> [PipeWriter]
+![Pipeline Overview](./pipeline.svg)
 
 By breaking up the pipeline into logical units we can achieve high amounts of flexibility and simultaneously
 reduce the amount of code we need to write and test. Defining interfaces are the logical boundaries of
 the pipeline allows you to fully customize any aspect of the pipeline without having to repeat code.
+
+The pipeline reads, processes and writes concurrently for each reader that is registered.
 
 
 ### Input/Output (IO): 
