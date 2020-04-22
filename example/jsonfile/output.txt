@@ -1,0 +1,8 @@
+{"first_name":"John","last_name":"Lennon","title":"Mr"}
+{"first_name":"Paul","last_name":"McCartney","title":"Mr"}
+{"first_name":"James","last_name":"Hetfield","title":"Mr"}
+{"first_name":"George","last_name":"Harrison","title":"Mr"}
+{"first_name":"Ringo","last_name":"Starr","title":"Mr"}
+{"first_name":"Kirk","last_name":"Hammett","title":"Mr"}
+{"first_name":"Lars","last_name":"Ulrich","title":"Mr"}
+{"first_name":"Jason","last_name":"Newstead","title":"Mr"}

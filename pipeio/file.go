@@ -5,19 +5,20 @@ import (
 	"os"
 )
 
-type FileLineReader struct {
-	r *bufio.Reader
+type FileReader struct {
+	r     *bufio.Reader
+	delim byte
 }
 
-func (f FileLineReader) Read() ([]byte, error) {
-	return f.r.ReadBytes('\n')
+func (f FileReader) Read() ([]byte, error) {
+	return f.r.ReadBytes(f.delim)
 }
 
-func NewFileLineReader(path string) (*FileLineReader, error) {
-	file, err := os.Open(path)
+func NewFileReader(path string, delim byte) (*FileReader, error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	reader := bufio.NewReader(file)
-	return &FileLineReader{r: reader}, nil
+	reader := bufio.NewReader(f)
+	return &FileReader{r: reader, delim: delim}, nil
 }

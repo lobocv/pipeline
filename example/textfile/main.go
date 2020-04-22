@@ -24,34 +24,32 @@ func (p ExampleLineProcessor) Process(ctx context.Context, payload interface{}) 
 	return []byte(processedLine), nil
 }
 
-type ExampleWriter struct{}
-
-func (p ExampleWriter) Write(payload []byte) (int, error) {
-	fmt.Println("Writing:", string(payload))
-	return len(payload), nil
-}
-
-type Input struct {
-	First string `json:"first_name"`
-	Last  string `json:"last_name"`
-}
-
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	reader1, err := pipeio.NewFileLineReader("./input.txt")
+	reader1, err := pipeio.NewFileReader("./input.txt", '\n')
 	mustSucceed(err)
 
-	reader2, err := pipeio.NewFileLineReader("./input2.txt")
+	reader2, err := pipeio.NewFileReader("./input2.txt", '\n')
 	mustSucceed(err)
 
-	outFile, err := os.OpenFile("./output.txt", os.O_WRONLY|os.O_CREATE, 0600)
+	outFile, err := os.Create("./output.txt")
 	mustSucceed(err)
 
+	// Don't do any encoding / decoding
 	passthrough := pencode.PassThrough{}
-	p := pipeline.NewPipeline(passthrough, passthrough)
+
+	p := pipeline.NewPipeline()
+
+	// Set the processor
 	p.SetProcessor(ExampleLineProcessor{})
-	p.AddReaders(reader1, reader2)
-	p.AddWriters(ExampleWriter{}, os.Stdout, outFile)
+
+	// Add the file readers and message sources
+	p.AddMessageSource(reader1, passthrough)
+	p.AddMessageSource(reader2, passthrough)
+
+	// Add stdout and a file as outputs
+	p.AddWriter(os.Stdout, passthrough)
+	p.AddWriter(outFile, passthrough)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

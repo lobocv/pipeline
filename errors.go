@@ -8,20 +8,23 @@ import (
 var EOF = io.EOF
 
 type pipelineError struct {
-	error
 	fatal     bool
 	temporary bool
 	msg       string
 }
 
 func (e *pipelineError) FromError(err error) {
-	e.error = err
+	e.msg = err.Error()
 	if specificErr, ok := err.(Fatal); ok {
 		e.fatal = specificErr.Fatal()
 	}
 	if specificErr, ok := err.(TemporaryError); ok {
 		e.fatal = specificErr.Temporary()
 	}
+}
+
+func (e *pipelineError) Error() string {
+	return e.msg
 }
 
 func overallError(errs ...pipelineError) *pipelineError {
@@ -40,6 +43,7 @@ func overallError(errs ...pipelineError) *pipelineError {
 		overall.temporary = overall.temporary && err.temporary
 	}
 	_, _ = msg.Write([]byte("]"))
+	overall.msg = msg.String()
 
 	return &overall
 }

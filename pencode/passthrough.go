@@ -18,3 +18,10 @@ func (d PassThrough) Encode(v interface{}) ([]byte, error) {
 	}
 	return raw, nil
 }
+
+type Printer struct {
+}
+
+func (p Printer) Encode(v interface{}) ([]byte, error) {
+	return []byte(fmt.Sprint(v)), nil
+}

@@ -6,7 +6,6 @@ import (
 	"github.com/lobocv/pipeline/pencode"
 	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
-	"net"
 	"time"
 
 	"github.com/lobocv/pipeline"
@@ -38,20 +37,19 @@ type Input struct {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	reader1, err := pipeio.NewFileLineReader("./input.txt")
-	mustSucceed(err)
-	reader2, err := pipeio.NewFileLineReader("./input2.txt")
-	mustSucceed(err)
 
-	outFile, err := os.OpenFile("./output.txt", os.O_WRONLY|os.O_CREATE, 0600)
+	// Read from the files one line at a time
+	lineReader, err := pipeio.NewFileReader("./input.txt", '\n')
 	mustSucceed(err)
 
-	// Use netcat -l -k localhost 8999 to see results :)
-	tcpConn, tcpConnErr := net.Dial("tcp", "localhost:8999")
-	// Use netcat -l -u -k localhost 8998 to see results :)
-	udpConn, udpConnErr := net.Dial("udp", "localhost:8998")
+	lineReader2, err := pipeio.NewFileReader("./input2.txt", '\n')
+	mustSucceed(err)
 
-	// Define the allocator, encoder and decoder
+	// Open a file to write output to
+	outFile, err := os.Create("./output.txt")
+	mustSucceed(err)
+
+	// Define the allocator, JSON encoder and decoder
 	alloc := func() interface{} {
 		return new(Input)
 	}
@@ -59,20 +57,17 @@ func main() {
 	enc := pencode.NewJSONEncoder()
 
 	// Create a new pipeline
-	p := pipeline.NewPipeline(dec, enc)
+	p := pipeline.NewPipeline()
+
 	// Set the processor
 	p.SetProcessor(ExampleJSONProcessor{})
 
 	// Add reads and writers
-	p.AddReaders(reader1, reader2)
-	p.AddWriters(outFile, os.Stdout)
-	// Only add network writers if there are listeners, otherwise you get pipeline errors
-	if tcpConnErr == nil {
-		p.AddWriters(tcpConn)
-	}
-	if udpConnErr == nil {
-		p.AddWriters(udpConn)
-	}
+	p.AddMessageSource(lineReader, dec)
+	p.AddMessageSource(lineReader2, dec)
+
+	// Set writer to the output file
+	p.AddWriter(outFile, enc)
 
 	// Stat the pipeline. This is blocking so we can set a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

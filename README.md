@@ -7,7 +7,7 @@ Pipelines follow a general work flow:
 ![Pipeline Overview](./pipeline.svg)
 
 By breaking up the pipeline into logical units we can achieve high amounts of flexibility and simultaneously
-reduce the amount of code we need to write and test. Defining interfaces are the logical boundaries of
+reduce the amount of code we need to write and test. Defining interfaces at the logical boundaries of
 the pipeline allows you to fully customize any aspect of the pipeline without having to repeat code.
 
 The pipeline reads, processes and writes concurrently for each reader that is registered.
@@ -15,25 +15,23 @@ The pipeline reads, processes and writes concurrently for each reader that is re
 
 ### Input/Output (IO): 
 
-The input and outputs of the pipe are byte streams. The pipeline accepts `PipeReader` and `PipeWriter` interfaces
-for the input and output respectively. These interfaces have `Read()` and `Write()` methods that accept `io.Reader`s.
-This allows the pipeline to read from any stream of data, whether that be from a queue like Kestrel or Kafka,
-a file like one stored locally or on S3, or even TCP like REST/gRPC.
+The input and outputs of the pipe are byte streams. The pipeline accepts `MessageReader` and `io.Reader` interfaces
+for the input and `io.WriteCloser` for the output. This gives users the flexibility to read and write from many sources
+such as queues, TCP / UDP connections, files, S3, HTTP or gRPC.
 
-The specific implementations just need to satisfy `PipeReader` and `PipeWriter` interfaces. Adapters
-can be made around external clients in order to support these interfaces.
+The specific implementations just need to satisfy `MessageReader` / `io.Reader` for reads and  `io.WriteCloser` interfaces.
+Adapters can be made around external clients in order to support these interfaces.
 
-#### PipeReaders
+#### Input
 
-The `PipeReader` reads byte data from a stream into the pipeline for processing. It can have 
-any implementation so long as it follows the `PipeReader` interface.
+Pipes can have two kinds of input, `MessageReader` which should perform a blocking read and return `[]byte` messages.
+The second is `io.Reader`, which should read messages into the specified `[]byte`. 
 
-#### PipeWriters
+#### Output
 
-The `PipeWriter` writes bytes to an external sink. It accepts an io.Reader which carries
-the data to write. It can have any implementation so long as it follows the `PipeWriter` interface.
+Pipes write to `io.WriteCloser`, which accept `[]byte`.
 
-Some examples of `PipeReader` / `PipeWriter` implementations are:
+Some examples of input and output implementations are:
 - Kestrel Queue
 - S3
 - Kafka
@@ -46,6 +44,8 @@ Encoding and decoding are done via interfaces so that the application can decide
 for it. In most cases this will be JSON as it is a comfortable and well-known format. However, some high 
 performance applications may decide to use a more efficient encoding such as Protocol Buffers, or even
 a different implementation of Go's JSON such as [easyjson](https://github.com/mailru/easyjson).
+
+Each input is tied to it's own encoder, giving you the ability to have sources with differing encoding.
 
 #### Decoding
 
@@ -74,7 +74,7 @@ structure you have defined. In your processor, one of the first things you shoul
 the `interface{}` into the data structure you are expecting. From then on out you are type safe!
 
 In your `Run()` method you should do all the processing you want on the data and then return it. 
-You should avoid writing to external sinks in the `Run()` method, this is what the `PipeWriter` is for. However,
+You should avoid writing to external sinks in the `Run()` method, this is what the `io.WriteCloser` is for.
  
 
 ### Error Handling
@@ -98,16 +98,3 @@ and combines the errors returned from all writers.
 Pipelines can set retry policies for errors by settings the `Retrier` interface.
 The default retry policy is to retry on `Temporary` errors and to not retry on `Fatal` errors. 
  
-
-### Adapters
-
-Adapters can be used to convert legacy or external libraries to work with `Pipelines`.
-This allows the legacy implementation to maintain the same code. This is good for transitioning
-over to the new pipeline architecture. To implement an adapter, make your input or output stream providers 
-satisfy the `PipeReader`, `PipeWriter` interface (or both).
-
-
-## Testing Pipelines
-
-Because all implementations should be defined externally to the pipeline and independently tested,
-pipelines need only to be tested for application specific logic found in the `Processor`.

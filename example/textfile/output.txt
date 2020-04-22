@@ -1,0 +1,8 @@
+XXXX 1. This is the first line from the example 1 XXXX
+XXXX 1. This is the first line from the example 2 XXXX
+XXXX 2. This is the second line from the example 2 XXXX
+XXXX 2. This is the second line from the example 1 XXXX
+XXXX 3. This is the third line from the example 1 XXXX
+XXXX 4. This is the last line from the example 1 XXXX
+XXXX 3. This is the third line from the example 2 XXXX
+XXXX 4. This is the last line from the example 2 XXXX
