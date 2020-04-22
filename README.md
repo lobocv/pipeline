@@ -86,6 +86,7 @@ can more easily decide what to do.
 Currently, the pipeline looks for the following qualities in errors:
 
 `Temporary` - Errors are temporary in nature like a network outage or 5XX series HTTP error.
+
 `Fatal` - Errors that are fatal to the overall goal of the pipeline. 
 
 The pipeline only receives a single error from the processing component of the pipeline.
