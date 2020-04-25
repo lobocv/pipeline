@@ -3,7 +3,10 @@ alias gitam="git commit --amend"
 alias gd="git diff"
 alias gl="git log"
 alias gs="git status"
+alias gc="git checkout"
 alias gitch="git checkout"
+alias gb="git branch --sort=-committerdate"
+
 alias newbranch="git checkout -b"
 
 # Checkout a local git branch
