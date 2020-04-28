@@ -3,34 +3,34 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/pencode"
-	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/lobocv/pipeline"
-	"os"
+	"github.com/lobocv/pipeline/pencode"
+	"github.com/lobocv/pipeline/pipeio"
 )
 
-type ExampleJSONProcessor struct{}
+type exampleJSONProcessor struct{}
 
-type Output struct {
-	Input
+type output struct {
+	input
 	Title string `json:"title"`
 }
 
 // Simple processor that adds a title field to the input data struct
-func (p ExampleJSONProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
+func (p exampleJSONProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
 	sleep := rand.Intn(1000)
 	time.Sleep(time.Duration(sleep) * time.Millisecond)
 
-	s := payload.(*Input)
+	s := payload.(*input)
 	fmt.Printf("Processor sees: First Name = %s Last Name = %s. Adding Mr title.\n", s.First, s.Last)
 
-	return Output{Input: *s, Title: "Mr"}, nil
+	return output{input: *s, Title: "Mr"}, nil
 }
 
-type Input struct {
+type input struct {
 	First string `json:"first_name"`
 	Last  string `json:"last_name"`
 }
@@ -51,16 +51,16 @@ func main() {
 
 	// Define the allocator, JSON encoder and decoder
 	alloc := func() interface{} {
-		return new(Input)
+		return new(input)
 	}
 	dec := pencode.NewJSONDecoder(alloc, false)
 	enc := pencode.NewJSONEncoder()
 
 	// Create a new pipeline
-	p := pipeline.NewPipeline()
+	p := generic.NewPipeline()
 
 	// Set the processor
-	p.SetProcessor(ExampleJSONProcessor{})
+	p.SetProcessor(exampleJSONProcessor{})
 
 	// Add reads and writers
 	p.AddMessageSource(lineReader, dec)

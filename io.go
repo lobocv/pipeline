@@ -1,9 +1,10 @@
-package pipeline
+package generic
 
 import (
-	"github.com/lobocv/pipeline/pencode"
 	"io"
 	"io/ioutil"
+
+	"github.com/lobocv/pipeline/pencode"
 )
 
 type pipeReader interface {
@@ -15,10 +16,13 @@ type pipeWriter interface {
 	Close() error
 }
 
+// MessageReader is an interface that represents one of the possible supported inputs to a pipeline
+// It describes a message stream that returns full messages on each read
 type MessageReader interface {
 	Read() ([]byte, error)
 }
 
+// coupler is a struct that allows pipelines to be joined together.
 type coupler struct {
 	data      chan interface{}
 	doneWrite chan struct{}
@@ -128,12 +132,14 @@ type nopCloser struct {
 
 func (nopCloser) Close() error { return nil }
 
-// NopWriteCloser returns a ReadCloser with a no-op Close method wrapping
+// NopWriteCloser returns a WriteCloser with a no-op Close method wrapping
 // the provided Reader r.
 func NopWriteCloser(wc io.Writer) io.WriteCloser {
 	return nopCloser{Writer: wc}
 }
 
+// NopReadCloser returns a io.ReadCloser with a no-op Close method wrapping
+// the provided Reader r.
 func NopReadCloser(r io.Reader) io.ReadCloser {
 	return ioutil.NopCloser(r)
 }

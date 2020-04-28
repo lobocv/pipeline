@@ -3,20 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/pencode"
-	"github.com/lobocv/pipeline/pipeio"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/lobocv/pipeline"
-	"os"
+	"github.com/lobocv/pipeline/pencode"
+	"github.com/lobocv/pipeline/pipeio"
 )
 
-type ExampleLineProcessor struct{}
+type exampleLineProcessor struct{}
 
 // Decorate the line with XXX. Sleep for a random amount of time to show asynchronicity
-func (p ExampleLineProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
+func (p exampleLineProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
 	s := string(payload.([]byte))
 	sleep := rand.Intn(1000)
 	time.Sleep(time.Duration(sleep) * time.Millisecond)
@@ -38,10 +38,10 @@ func main() {
 	// Don't do any encoding / decoding
 	passthrough := pencode.PassThrough{}
 
-	p := pipeline.NewPipeline()
+	p := generic.NewPipeline()
 
 	// Set the processor
-	p.SetProcessor(ExampleLineProcessor{})
+	p.SetProcessor(exampleLineProcessor{})
 
 	// Add the file readers and message sources
 	p.AddMessageSource(reader1, passthrough)

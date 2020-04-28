@@ -3,18 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lobocv/pipeline/pencode"
 	"net"
 	"os"
 	"time"
 
-	"github.com/lobocv/pipeline"
+	generic "github.com/lobocv/pipeline"
+	"github.com/lobocv/pipeline/pencode"
 )
 
-type ExampleJSONProcessor struct{}
+type exampleJSONProcessor struct{}
 
 // Simple processor that reverses the input. Expects []byte payload
-func (p ExampleJSONProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
+func (p exampleJSONProcessor) Process(ctx context.Context, payload interface{}) (interface{}, error) {
 	s := payload.([]byte)
 	for ii := 0; ii < len(s)/2; ii++ {
 		jj := len(s) - 1 - ii
@@ -41,10 +41,10 @@ func main() {
 	passthrough := pencode.PassThrough{}
 
 	// Create a new pipeline
-	p := pipeline.NewPipeline()
+	p := generic.NewPipeline()
 
 	// Set the processor
-	p.SetProcessor(ExampleJSONProcessor{})
+	p.SetProcessor(exampleJSONProcessor{})
 
 	// Add the connection as both a reader and a writer
 	p.AddReader(conn, passthrough, make([]byte, 1000))

@@ -1,10 +1,11 @@
-package pipeline
+package generic
 
 import (
 	"io"
 	"strings"
 )
 
+// EOF represents the end of file from a input stream. It is an alias for io.EOF
 var EOF = io.EOF
 
 type pipelineError struct {
@@ -27,20 +28,22 @@ func (e *pipelineError) Error() string {
 	return e.msg
 }
 
-func overallError(errs ...pipelineError) *pipelineError {
+func overallError(errs ...error) *pipelineError {
 	var overall pipelineError
 	var msg strings.Builder
 	_, _ = msg.Write([]byte("errors detected in the pipeline: ["))
 	for ii, err := range errs {
+		var pipelineErr pipelineError
+		pipelineErr.FromError(err)
 		// Combine error message strings
-		_, _ = msg.Write([]byte(err.msg))
+		_, _ = msg.Write([]byte(pipelineErr.msg))
 		if ii < len(errs)-1 {
 			_, _ = msg.Write([]byte("|"))
 		}
 		// Determine overall status of flags
 		// If any errors are fatal, the overall error is fatal
-		overall.fatal = overall.fatal || err.fatal
-		overall.temporary = overall.temporary && err.temporary
+		overall.fatal = overall.fatal || pipelineErr.fatal
+		overall.temporary = overall.temporary && pipelineErr.temporary
 	}
 	_, _ = msg.Write([]byte("]"))
 	overall.msg = msg.String()
